@@ -17,32 +17,31 @@ void setup () {
 }
 
 void loop () {
-
-                                                                
   if ((BootKeyboard.getLeds() & LED_CAPS_LOCK) == 0) {	        // Если светодиод Caps Lock не горит, то
-label:                                                          // Метка, которая необходима дря работы оператора goto
-    if (millis() - timer > 500) {								                // каждые 500 мс эмулируем нажатие на кнопку Caps Lock
-      BootKeyboard.write(KEY_CAPS_LOCK);
-      //delay (10);
-      timer = millis();											                    // Сбрасываем таймер, ждём снова 500 мс.
-    }
-    L_red = true;												                        // Зажигаем красный светодиод
-    L_green = false;											                      // Тушим зелёный светодиод
-    digitalWrite (LED_red, L_red);
-    digitalWrite (LED_green, L_green);
-  }
-
-  if ((BootKeyboard.getLeds() & LED_CAPS_LOCK) == 0x02) {		    // Если светодиод Caps Lock горит, то
-    while (1) {													                        // уходим в бесконечный цикл
-      L_red = false;											                      // Тушим красный светодиод
-      L_green = true;											                      // Зажигаем зелёный
-      digitalWrite (LED_red, L_red);
-      digitalWrite (LED_green, L_green);
-      if ((BootKeyboard.getLeds() & LED_CAPS_LOCK) == 0) {	    // Условие для выхода из бесконечного цикла. Если светодиод Caps Lock не горит,
-        L_red = false;											                    // то тушим все светодиоды
-        L_green = false;
-        goto label;												                      // и переходим в начало программы.
+    Leds();
+    
+    if ((BootKeyboard.getLeds() & LED_CAPS_LOCK) == 0x02) {		    // Если светодиод Caps Lock горит, то
+      while (1) {													                        // уходим в бесконечный цикл
+        setLeds(false,true);
+        if ((BootKeyboard.getLeds() & LED_CAPS_LOCK) == 0) {	    // Условие для выхода из бесконечного цикла. Если светодиод Caps Lock не горит,
+          setLeds(false,false);
+          break;												                      // и переходим в начало программы.
+        }
       }
     }
+  }
+}
+
+void setLeds(bool _red, bool _green) {
+      digitalWrite (LED_red, _red);
+      digitalWrite (LED_green, _green);
+}
+
+void Leds() {
+    if (millis() - timer > 500) {								                // каждые 500 мс эмулируем нажатие на кнопку Caps Lock
+      BootKeyboard.write(KEY_CAPS_LOCK);
+      timer = millis();											                    // Сбрасываем таймер, ждём снова 500 мс.
+    }
+    setLeds(true, false);                                       // Зажигаем красный светодиод, тушим зелёный светодиод
   }
 }
